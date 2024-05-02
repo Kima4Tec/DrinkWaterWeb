@@ -36,14 +36,26 @@
 }
 else
 {
-    <p>No more questions.</p>
+    <p>Der er ikke flere spørgsmål.</p>
+    PointText = $"Antal rigtige: {AntalRigtige} - Antal forkerte: {AntalForkerte}";
 }
+
+<div>
+
+    <p>@PointText</p>
+
+</div>
 
 @code {
     private List<QuestionHandler> allQuestions;
     private int currentQuestionIndex = 0;
     private QuestionHandler currentQuestion;
     private string selectedOption;
+    public int AntalRigtige { get; set; }
+    public int AntalForkerte { get; set; }
+    public int AntalSvar { get; set; }
+    public string RightAnswer { get; set; }
+    public string PointText { get; set; }
 
     protected override void OnInitialized()
     {
@@ -63,6 +75,17 @@ else
 
     private void NextQuestion()
     {
+        var rightAnswer = currentQuestion.Options[currentQuestion.Answer];
+        var chosenAnswer = selectedOption;
+
+        if (chosenAnswer == rightAnswer)
+        {
+            AntalRigtige++;
+        }
+        else
+        {
+            AntalForkerte++;
+        }
         if (currentQuestionIndex < allQuestions.Count - 1)
         {
             currentQuestionIndex++;
