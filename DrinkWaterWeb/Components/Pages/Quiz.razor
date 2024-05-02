@@ -1,0 +1,78 @@
+﻿@using DrinkWaterWeb.Services
+@using Newtonsoft.Json
+@page "/quiz"
+@inject Services.QuestionHandler QuestionHandler
+@rendermode InteractiveServer
+@* @attribute [StreamRendering] *@
+
+<PageTitle>Drinking water quiz</PageTitle>
+
+<h1>Drinking water quiz</h1>
+
+<p>Danskerne bruger for meget vand når der er tørke. Bliv klogere på, hvad der bruger mest vand i hjemmet, ved at tage denne quiz</p>
+
+@if (currentQuestion != null)
+{
+    <h3>@currentQuestion.Question</h3>
+
+    <div>
+        @foreach (var option in currentQuestion.Options)
+        {
+            <div>
+                <input type="radio" id="@option" name="options" value="@option" checked="@IsOptionSelected(option)" @onchange="OptionSelected" />
+                <label for="@option">@option</label>
+            </div>
+        }
+    </div>
+
+    <button @onclick="NextQuestion">Next</button>
+
+    @if (!string.IsNullOrEmpty(selectedOption))
+    {
+        <div>
+            <p>Explanation: @currentQuestion.Explanation</p>
+        </div>
+    }
+}
+else
+{
+    <p>No more questions.</p>
+}
+
+@code {
+    private List<QuestionHandler> allQuestions;
+    private int currentQuestionIndex = 0;
+    private QuestionHandler currentQuestion;
+    private string selectedOption;
+
+    protected override void OnInitialized()
+    {
+        allQuestions = QuestionHandler.GetQuestions();
+        currentQuestion = allQuestions.FirstOrDefault();
+    }
+
+    private bool IsOptionSelected(string option)
+    {
+        return option == selectedOption;
+    }
+
+    private void OptionSelected(ChangeEventArgs args)
+    {
+        selectedOption = args.Value?.ToString();
+    }
+
+    private void NextQuestion()
+    {
+        if (currentQuestionIndex < allQuestions.Count - 1)
+        {
+            currentQuestionIndex++;
+            currentQuestion = allQuestions[currentQuestionIndex];
+            selectedOption = null;
+        }
+        else
+        {
+            currentQuestion = null;
+        }
+    }
+}
+
